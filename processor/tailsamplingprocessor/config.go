@@ -49,6 +49,8 @@ const (
 	// BooleanAttribute sample traces having an attribute, of type bool, that matches
 	// the specified boolean value [true|false].
 	BooleanAttribute PolicyType = "boolean_attribute"
+	// UniqueTracePath sample traces by the appearance frequency of different trace paths.
+	UniqueTracePath PolicyType = "unique_trace_path"
 )
 
 // sharedPolicyCfg holds the common configuration to all policies that are used in derivative policy configurations
@@ -76,6 +78,8 @@ type sharedPolicyCfg struct {
 	TraceStateCfg TraceStateCfg `mapstructure:"trace_state"`
 	// Configs for boolean attribute filter sampling policy evaluator.
 	BooleanAttributeCfg BooleanAttributeCfg `mapstructure:"boolean_attribute"`
+	//
+	UniqueTracePathCfg UniqueTracePathCfg `mapstructure:"unique_trace_path"`
 }
 
 // CompositeSubPolicyCfg holds the common configuration to all policies under composite policy.
@@ -206,6 +210,11 @@ type BooleanAttributeCfg struct {
 	// Value indicate the bool value, either true or false to use when matching against attribute values.
 	// BooleanAttribute Policy will apply exact value match on Value
 	Value bool `mapstructure:"value"`
+}
+
+type UniqueTracePathCfg struct {
+	Period    int32 `mapstructure:"period"`
+	Frequency int32 `mapstructure:"frequency"`
 }
 
 // Config holds the configuration for tail-based sampling.

@@ -159,6 +159,9 @@ func getSharedPolicyEvaluator(logger *zap.Logger, cfg *sharedPolicyCfg) (samplin
 	case BooleanAttribute:
 		bafCfg := cfg.BooleanAttributeCfg
 		return sampling.NewBooleanAttributeFilter(logger, bafCfg.Key, bafCfg.Value), nil
+	case UniqueTracePath:
+		utpCfg := cfg.UniqueTracePathCfg
+		return sampling.NewUniqueTracePathFilter(logger, utpCfg.Period, utpCfg.Frequency), nil
 	default:
 		return nil, fmt.Errorf("unknown sampling policy type %s", cfg.Type)
 	}
