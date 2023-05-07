@@ -214,7 +214,7 @@ type BooleanAttributeCfg struct {
 
 type UniqueTracePathCfg struct {
 	Period    int32 `mapstructure:"period"`
-	Frequency int32 `mapstructure:"frequency"`
+	Frequency int64 `mapstructure:"frequency"`
 }
 
 // Config holds the configuration for tail-based sampling.
