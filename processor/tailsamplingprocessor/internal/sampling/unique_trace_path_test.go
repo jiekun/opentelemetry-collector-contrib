@@ -29,7 +29,7 @@ func TestEvaluate_UniqueTracePath(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.Desc, func(t *testing.T) {
 			filter := NewUniqueTracePathFilter(zap.NewNop(), 10, 1)
-			traces := newTracesWithSpans(c.spanCounts)
+			traces := newTracesWithSpans(c.spanCounts, 100)
 
 			sampleCount := 0
 			for i := range traces {
@@ -40,29 +40,33 @@ func TestEvaluate_UniqueTracePath(t *testing.T) {
 				}
 			}
 
+			fmt.Printf("total traces: %d, sampled traces: %d\n", len(traces), sampleCount)
+
 			assert.Equal(t, sampleCount, c.sampledCount)
 		})
 	}
 }
 
-func newTracesWithSpans(spanCounts []int) []*TraceData {
+func newTracesWithSpans(spanCounts []int, count int) []*TraceData {
 	var td []*TraceData
 
-	for i := range spanCounts {
-		traces := ptrace.NewTraces()
-		rs := traces.ResourceSpans().AppendEmpty()
-		ils := rs.ScopeSpans().AppendEmpty()
+	for t := 0; t < count; t++ {
+		for i := range spanCounts {
+			traces := ptrace.NewTraces()
+			rs := traces.ResourceSpans().AppendEmpty()
+			ils := rs.ScopeSpans().AppendEmpty()
 
-		for j := 0; j < spanCounts[i]; j++ {
-			span := ils.Spans().AppendEmpty()
-			span.SetTraceID([16]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16})
-			span.SetSpanID([8]byte{1, 2, 3, 4, 5, 6, 7, 8})
-			span.SetName(fmt.Sprintf("span_%d", j))
-			span.SetEndTimestamp(pcommon.NewTimestampFromTime(time.Now()))
+			for j := 0; j < spanCounts[i]; j++ {
+				span := ils.Spans().AppendEmpty()
+				span.SetTraceID([16]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16})
+				span.SetSpanID([8]byte{1, 2, 3, 4, 5, 6, 7, 8})
+				span.SetName(fmt.Sprintf("span_%d", j))
+				span.SetEndTimestamp(pcommon.NewTimestampFromTime(time.Now()))
+			}
+			td = append(td, &TraceData{
+				ReceivedBatches: traces,
+			})
 		}
-		td = append(td, &TraceData{
-			ReceivedBatches: traces,
-		})
 	}
 
 	return td
